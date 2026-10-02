@@ -1,6 +1,8 @@
 const app = document.getElementById('app');
 const PLAN_URL = app.dataset.planUrl;
 const CSRF = app.dataset.csrf;
+const CREATE_URL = app.dataset.createUrl;
+const EDITOR_URL = app.dataset.editorUrl;
 let W = Number(app.dataset.w), H = Number(app.dataset.h);
 const SNAP=5;
 const OPEN={window:[55,175],arch:[55,175]};
@@ -175,27 +177,71 @@ function setMsg(text,isErr){
   m.textContent=text;m.className=isErr?'warn':'note';m.hidden=!text;
 }
 
+function planPayload(){
+  return {items:items.map(i=>({kind:i.kind,name:i.name,x:Math.round(i.x),y:Math.round(i.y),w:Math.round(i.w),h:Math.round(i.h),wall:!!i.wall}))};
+}
+
+// Отправляет JSON на сервер. Возвращает ответ сервера или бросает ошибку с понятным текстом.
+async function postJSON(url,payload){
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':CSRF||''},body:JSON.stringify(payload)});
+  let data=null;try{data=await r.json()}catch(e){}
+  if(r.ok&&data)return data;
+  if(r.status===403)throw new Error('сервер отклонил запрос (403). Проверь, что в шаблоне есть data-csrf');
+  if(data&&Array.isArray(data.errors)){
+    const lines=data.errors.map(er=>{
+      const it=(payload.items||[])[er.index];
+      const msgs=Object.values(er.messages||{}).flat().join(' ');
+      return (it?it.name:'План')+': '+msgs;
+    });
+    throw new Error(lines.join('; '));
+  }
+  if(data&&data.error)throw new Error(data.error);
+  throw new Error('сервер ответил '+r.status);
+}
+
 function savePlan(){
   const btn=$('save');btn.disabled=true;setMsg('Сохраняю…',false);
-  const payload={items:items.map(i=>({kind:i.kind,name:i.name,x:Math.round(i.x),y:Math.round(i.y),w:Math.round(i.w),h:Math.round(i.h),wall:!!i.wall}))};
-  fetch(PLAN_URL,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':CSRF||''},body:JSON.stringify(payload)})
-    .then(async r=>{
-      let data=null;try{data=await r.json()}catch(e){}
-      if(r.ok&&data&&data.room){applyPlan(data);setMsg('Сохранено',false);return}
-      if(r.status===403)throw new Error('сервер отклонил запрос (403). Проверь, что в шаблоне есть data-csrf');
-      if(data&&Array.isArray(data.errors)){
-        const lines=data.errors.map(er=>{
-          const it=payload.items[er.index];
-          const msgs=Object.values(er.messages||{}).flat().join(' ');
-          return (it?it.name:'План')+': '+msgs;
-        });
-        throw new Error(lines.join('; '));
-      }
-      if(data&&data.error)throw new Error(data.error);
-      throw new Error('сервер ответил '+r.status);
-    })
+  postJSON(PLAN_URL,planPayload())
+    .then(data=>{applyPlan(data);setMsg('Сохранено',false)})
     .catch(e=>setMsg('Не сохранилось: '+e.message,true))
     .finally(()=>{btn.disabled=false});
+}
+
+// «Сохранить как…»: маленькая форма с названием появляется рядом с кнопками
+function setupSaveAs(){
+  const save=$('save');
+  const missing=[];
+  if(!CREATE_URL)missing.push('data-create-url');
+  if(!EDITOR_URL)missing.push('data-editor-url');
+  if(missing.length)console.warn('«Сохранить как…» не настроено: в <div id="app"> нет '+missing.join(' и '));
+  const open=document.createElement('button');
+  open.type='button';open.id='saveAs';open.textContent='Сохранить как…';
+  if(save)save.after(open);else $('panel').querySelector('.btns').prepend(open);
+
+  const box=document.createElement('div');
+  box.id='saveAsBox';box.className='saveas';box.hidden=true;
+  box.innerHTML='<label class="field" for="saveAsName">Название варианта <input id="saveAsName" class="name" type="text" maxlength="256"></label>'+
+    '<button id="saveAsOk" class="primary" type="button">Создать</button>'+
+    '<button id="saveAsCancel" type="button">Отмена</button>';
+  $('panel').appendChild(box);
+
+  const name=$('saveAsName'),ok=$('saveAsOk');
+  const close=()=>{box.hidden=true;open.disabled=false};
+  open.onclick=()=>{
+    if(missing.length){setMsg('«Сохранить как…» не настроено: в шаблоне в <div id="app"> не хватает '+missing.join(' и '),true);return}
+    box.hidden=false;open.disabled=true;setMsg('',false);name.focus();name.select()};
+  $('saveAsCancel').onclick=close;
+  name.onkeydown=e=>{if(e.key==='Enter')ok.click();if(e.key==='Escape')close()};
+  name.oninput=()=>setMsg('',false);
+  ok.onclick=()=>{
+    const title=name.value.trim();
+    if(!title){setMsg('Введи название варианта',true);name.focus();return}
+    ok.disabled=true;setMsg('Создаю вариант…',false);
+    postJSON(CREATE_URL,Object.assign({title},planPayload()))
+      .then(data=>{setMsg('Вариант создан, открываю…',false);window.location.href=EDITOR_URL.replace('/0/','/'+data.layout.id+'/')})
+      .catch(e=>{setMsg('Не создано: '+e.message,true);name.focus()})
+      .finally(()=>{ok.disabled=false});
+  };
 }
 
 function loadPlan(){
@@ -206,4 +252,5 @@ function loadPlan(){
     .catch(e=>{err.textContent='Не удалось загрузить план: '+e.message+'. Проверь, что runserver запущен.';err.hidden=false});
 }
 
+setupSaveAs();
 drawFixed();draw();loadPlan();

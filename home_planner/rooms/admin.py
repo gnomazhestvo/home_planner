@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Item, Room
+from .models import Item, Layout, Room
 
 
 class ItemsInline(admin.TabularInline):
@@ -8,9 +8,24 @@ class ItemsInline(admin.TabularInline):
     extra = 1
 
 
+class LayoutInlines(admin.TabularInline):
+    model = Layout
+    extra = 1
+
+
+@admin.register(Layout)
+class LayoutAdmin(admin.ModelAdmin):
+    inlines = (ItemsInline,)
+    list_display = (
+        'room',
+        'title',
+        'created_at',
+    )
+
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    inlines = (ItemsInline,)
+    inlines = (LayoutInlines,)
     list_display = (
         'title',
         'x_dimension',
@@ -27,7 +42,7 @@ class ItemAdmin(admin.ModelAdmin):
     list_display = (
         'kind',
         'title',
-        'room',
+        'layout',
         'x_coordinate',
         'y_coordinate',
         'x_dimension',

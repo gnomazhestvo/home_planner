@@ -42,9 +42,9 @@ class Item(models.Model):
         STAND = 'stand', 'Тумба'
         OTHER = 'other', 'Другое'
 
-    room = models.ForeignKey(
-        Room,
-        verbose_name='Комната',
+    layout = models.ForeignKey(
+        'Layout',
+        verbose_name='Вариант',
         related_name='items',
         on_delete=models.CASCADE
     )
@@ -90,7 +90,7 @@ class Item(models.Model):
 
     def clean(self):
         super().clean()
-        if not self.room_id:
+        if not self.layout_id:
             return
         if None in (
             self.x_dimension,
@@ -101,9 +101,42 @@ class Item(models.Model):
             return
 
         errors = {}
-        if self.x_coordinate + self.x_dimension > self.room.x_dimension:
+        if self.x_coordinate + self.x_dimension > self.layout.room.x_dimension:
             errors['x_coordinate'] = 'Предмет выходит за правую стену комнаты'
-        if self.y_coordinate + self.y_dimension > self.room.y_dimension:
+        if self.y_coordinate + self.y_dimension > self.layout.room.y_dimension:
             errors['y_coordinate'] = 'Предмет выходит за нижнюю стену комнаты'
         if errors:
             raise ValidationError(errors)
+
+
+class Layout(models.Model):
+    """Вариант расстановки."""
+
+    room = models.ForeignKey(
+        Room,
+        verbose_name='Комната',
+        related_name='layouts',
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(
+        max_length=256,
+        verbose_name='Название',
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Добавлено'
+    )
+
+    class Meta:
+        verbose_name = 'Вариант'
+        verbose_name_plural = 'Варианты'
+        ordering = ('-created_at',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'room',],
+                name='unique_layout_title_per_room',
+            )
+        ]
+
+    def __str__(self):
+        return self.title

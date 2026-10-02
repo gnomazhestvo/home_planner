@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>{{ room.title }}: {{ room.x_dimension }} × {{ room.y_dimension }} - варианты</title>
+</head>
+
+<body>
+  <div>
+    <h1>{{ room.title }}</h1>
+  </div>
+  {% for layout in layouts %}
+    <p><a href="{% url 'rooms:layout_editor' layout.id %}">{{ layout.title }}</a>
+    ({{ layout.items.count }})
+    {{ layout.created_at|date:"d.m.Y H:i" }}</p>
+  {% empty %}
+    <p>Пока нет ни одного варианта</p>
+    <p>Создать</p>
+  {% endfor %}
+</body>
+
+</html>

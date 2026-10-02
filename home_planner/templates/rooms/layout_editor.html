@@ -4,19 +4,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ room.title }}: {{ room.x_dimension }} × {{ room.y_dimension }}</title>
+  <title>{{ layout.room.title }}: {{ layout.room.x_dimension }} × {{ layout.room.y_dimension }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="{% static 'rooms/css/editor.css' %}">
 </head>
 <body>
 <div class="wrap" id="app"
-     data-plan-url="{% url 'rooms:room_plan' room.id %}"
-     data-w="{{ room.x_dimension }}"
-     data-h="{{ room.y_dimension }}"
+     data-plan-url="{% url 'rooms:layout_plan' layout.id %}"
+     data-w="{{ layout.room.x_dimension }}"
+     data-h="{{ layout.room.y_dimension }}"
+     data-create-url="{% url 'rooms:layout_create' layout.room.id %}"
+     data-editor-url="{% url 'rooms:layout_editor' 0 %}"
      data-csrf="{{ csrf_token }}">
   <header>
-    <h1>{{ room.title }}</h1>
+    <p><a href="{% url 'rooms:layout_list' layout.room.id %}">← все варианты</a></p><br>
+    <h1>{{ layout.room.title }}: вариант {{ layout.title }}</h1>
     <p class="hint">Тащи мебель мышкой или пальцем, размер меняется за уголок справа снизу. Пунктиром показаны расстояния до стен и соседей, шаг 5 см. Изменения пока не сохраняются на сервер.</p>
   </header>
 
