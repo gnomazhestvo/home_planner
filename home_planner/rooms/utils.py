@@ -36,6 +36,10 @@ def serialize_plan(layout):
 
 
 def build_items(layout, items_data):
+    """
+    Создает и проверяет предметы мебели для варианта, не сохраняя их.
+    Возвращает пару: список проверенных объектов Item - список ошибок.
+    """
     new_items = []
     errors = []
     for index, item_data in enumerate(items_data):

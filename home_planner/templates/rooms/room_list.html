@@ -15,7 +15,8 @@
     <h1>Планнер планировок</h1>
     <p class="room-size">Проектов: {{ rooms|length }}</p>
   </header>
-  <div class="wrap">
+  
+  <main class="wrap">
     <ul class="layouts">
       {% for room in rooms %}
       <li>
@@ -28,5 +29,5 @@
         <li class="empty">Пока нет ни одного проекта. Создать</li>
       {% endfor %}
     </ul>
-  </div>
+  </main>
 {% endblock %}

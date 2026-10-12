@@ -1,7 +1,8 @@
 import json
 
 from django.core.exceptions import ValidationError
-from django.db import transaction, models
+from django.db import transaction
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
@@ -68,7 +69,7 @@ def layout_create(request, room_id):
             {'error': 'title должен быть строкой'},
             status=400
         )
-    if not isinstance(data, dict) or 'items' not in data:
+    if 'items' not in data:
         return JsonResponse(
             {'error': 'Ожидается объект с ключом items'},
             status=400,
@@ -124,7 +125,7 @@ def layout_list(request, room_id):
 
 def room_list(request):
     template_name = 'rooms/room_list.html'
-    rooms = Room.objects.annotate(layouts_count=models.Count('layouts'))
+    rooms = Room.objects.annotate(layouts_count=Count('layouts'))
     context = {
         'rooms': rooms,
     }

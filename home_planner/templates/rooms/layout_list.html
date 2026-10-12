@@ -15,7 +15,8 @@
     <h1>{{ room.title }}</h1>
     <p class="room-size">{{ room.x_dimension }} x {{ room.y_dimension }} см</p>
   </header>
-  <div class="wrap">
+  
+  <main class="wrap">
     <ul class="layouts">
       {% for layout in layouts %}
       <li>
@@ -29,7 +30,5 @@
         <li class="empty">Пока нет ни одного варианта. Создать</li>
       {% endfor %}
     </ul>
-  </div>
+  </main>
 {% endblock %}
-</body>
-</html>
