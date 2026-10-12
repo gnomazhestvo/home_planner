@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -11,18 +11,27 @@ class Room(models.Model):
     )
     x_dimension = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1)
+            MinValueValidator(1),
+            MaxValueValidator(2000),
         ],
         verbose_name='Размер по x, см',
     )
     y_dimension = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1)
+            MinValueValidator(1),
+            MaxValueValidator(2000),
         ],
         verbose_name='Размер по y, см',
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title',],
+                name='unique_room_title',
+            )
+        ]
+
         verbose_name = 'Комната'
         verbose_name_plural = 'Комнаты'
 

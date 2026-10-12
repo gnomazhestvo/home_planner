@@ -27,8 +27,11 @@
         </a>
       </li>
       {% empty %}
-        <li class="empty">Пока нет ни одного варианта. Создать</li>
+        <li class="empty">Пока нет ни одного варианта.</li>
       {% endfor %}
+      <li>
+        <a href="{% url 'rooms:layout_new' room.id %}">Создать</a>
+      </li>
     </ul>
   </main>
 {% endblock %}

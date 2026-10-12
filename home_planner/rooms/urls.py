@@ -6,8 +6,10 @@ app_name = 'rooms'
 
 urlpatterns = [
     path('', views.room_list, name='room_list'),
+    path('rooms/create/', views.room_create, name='room_create'),
     path('rooms/<int:room_id>/', views.layout_list, name='layout_list'),
     path('rooms/<int:room_id>/layouts/', views.layout_create, name='layout_create'),
+    path('rooms/<int:room_id>/layouts/new/', views.layout_new, name='layout_new'),
     path('layouts/<int:layout_id>/', views.layout_editor, name='layout_editor'),
     path('layouts/<int:layout_id>/plan/', views.layout_plan, name='layout_plan'),
 ]

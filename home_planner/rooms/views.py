@@ -4,9 +4,10 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Count
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
+from .forms import RoomForm, LayoutForm
 from .models import Item, Layout, Room
 from .utils import build_items, serialize_plan
 
@@ -112,6 +113,19 @@ def layout_editor(request, layout_id):
     return render(request, template_name, context)
 
 
+def layout_new(request, room_id):
+    template_name = 'rooms/layout_form.html'
+    room = get_object_or_404(Room, pk=room_id)
+    form = LayoutForm(request.POST or None, room=room)
+    if form.is_valid():
+        layout = form.save(commit=False)
+        layout.room = room
+        layout.save()
+        return redirect('rooms:layout_editor', layout_id=layout.id)
+    context = {'form': form, 'room': room}
+    return render(request, template_name, context)
+
+
 def layout_list(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     layouts = room.layouts.prefetch_related('items')
@@ -129,4 +143,14 @@ def room_list(request):
     context = {
         'rooms': rooms,
     }
+    return render(request, template_name, context)
+
+
+def room_create(request):
+    template_name = 'rooms/room_form.html'
+    form = RoomForm(request.POST or None)
+    if form.is_valid():
+        room = form.save()
+        return redirect('rooms:layout_list', room_id=room.id)
+    context = {'form': form}
     return render(request, template_name, context)

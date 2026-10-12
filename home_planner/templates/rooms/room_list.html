@@ -26,8 +26,11 @@
         </a>
       </li>
       {% empty %}
-        <li class="empty">Пока нет ни одного проекта. Создать</li>
+        <li class="empty">Пока нет ни одного проекта.</li>
       {% endfor %}
+      <li>
+        <a href="{% url 'rooms:room_create' %}">Создать</a>
+      </li>
     </ul>
   </main>
 {% endblock %}
