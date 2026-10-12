@@ -1,7 +1,7 @@
 import json
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import transaction, models
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
@@ -118,5 +118,14 @@ def layout_list(request, room_id):
     context = {
         'room': room,
         'layouts': layouts,
+    }
+    return render(request, template_name, context)
+
+
+def room_list(request):
+    template_name = 'rooms/room_list.html'
+    rooms = Room.objects.annotate(layouts_count=models.Count('layouts'))
+    context = {
+        'rooms': rooms,
     }
     return render(request, template_name, context)

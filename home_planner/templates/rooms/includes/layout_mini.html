@@ -1,0 +1,7 @@
+<svg class="thumb" viewBox="0 0 {{ room.x_dimension }} {{ room.y_dimension }}" role="img" aria-label="План: {{ layout.title }}">
+  <rect class="thumb-room" x="0" y="0" width="{{ room.x_dimension }}" height="{{ room.y_dimension }}"></rect>
+  {% for item in layout.items.all %}
+    <rect class="thumb-item thumb-{{ item.kind }}" x="{{ item.x_coordinate }}" y="{{ item.y_coordinate }}" width="{{ item.x_dimension }}" height="{{ item.y_dimension }}" />
+  {% endfor %}
+  <rect class="thumb-walls" x="0" y="0" width="{{ room.x_dimension }}" height="{{  room.y_dimension }}" />
+</svg>

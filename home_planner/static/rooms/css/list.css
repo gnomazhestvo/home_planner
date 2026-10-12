@@ -1,0 +1,138 @@
+/* ===== Цвета и шрифты ===== */
+:root {
+  --paper: #eef2f3;    /* фон страницы */
+  --sheet: #f8fafa;    /* фон карточек */
+  --ink: #1d2830;      /* основной текст и стены */
+  --muted: #5b6a74;    /* второстепенный текст */
+  --line: #c6d0d5;     /* рамки */
+  --accent: #2a68ad;   /* ссылки и наведение */
+  --floor: #ffffff;    /* пол на миниатюре */
+
+  /* мебель — те же цвета, что в редакторе */
+  --bed: #d9d3ec;
+  --desk: #ecd9b4;
+  --store: #cfe5df;
+  --chair: #e4e7ea;
+  --tv: #26323a;
+}
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-bottom: 24px;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.5 "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px 16px 32px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.room-size {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ===== Сетка карточек ===== */
+.layouts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.layouts > li {
+    flex: 0 1 300px;
+}
+
+.layout-card {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.layout-card:hover,
+.layout-card:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.layout-title {
+  font-weight: 600;
+}
+
+.layout-card:hover .layout-title {
+  color: var(--accent);
+}
+
+.layout-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+/* ===== Миниатюра (SVG) =====
+   Внутри SVG координаты — сантиметры комнаты (viewBox),
+   поэтому stroke-width тоже в сантиметрах. */
+.thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;   /* обводка стен рисуется по краю и наполовину выходит за viewBox */
+}
+
+/* пол — первым слоем, стены — последним, поверх мебели */
+.thumb-room {
+  fill: var(--floor);
+}
+
+.thumb-walls {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+}
+
+.thumb-item {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-opacity: 0.4;
+}
+
+.thumb-bed   { fill: var(--bed); }
+.thumb-desk  { fill: var(--desk); }
+.thumb-shelf,
+.thumb-stand { fill: var(--store); }
+.thumb-chair,
+.thumb-other { fill: var(--chair); }
+.thumb-tv    { fill: var(--tv); }

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Планнер
+{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'rooms/css/list.css' %}">
+{% endblock %}
+
+
+{% block content %}
+  <header class="wrap">
+    <h1>Планнер планировок</h1>
+    <p class="room-size">Проектов: {{ rooms|length }}</p>
+  </header>
+  <div class="wrap">
+    <ul class="layouts">
+      {% for room in rooms %}
+      <li>
+        <a class="layout-card" href="{% url 'rooms:layout_list' room.id %}">
+          <span class="layout-title">{{ room.title }}</span>
+          <span class="layout-meta">{{ room.x_dimension }} x {{ room.y_dimension }} · вариантов: {{ room.layouts_count }}</span>
+        </a>
+      </li>
+      {% empty %}
+        <li class="empty">Пока нет ни одного проекта. Создать</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

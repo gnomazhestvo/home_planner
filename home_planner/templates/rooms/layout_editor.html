@@ -1,62 +1,65 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ layout.room.title }}: {{ layout.room.x_dimension }} × {{ layout.room.y_dimension }}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+{% block title %}
+  {{ layout.room.title }}: {{ layout.room.x_dimension }} × {{ layout.room.y_dimension }}
+{% endblock %}
+
+{% block styles %}
   <link rel="stylesheet" href="{% static 'rooms/css/editor.css' %}">
-</head>
-<body>
-<div class="wrap" id="app"
-     data-plan-url="{% url 'rooms:layout_plan' layout.id %}"
-     data-w="{{ layout.room.x_dimension }}"
-     data-h="{{ layout.room.y_dimension }}"
-     data-create-url="{% url 'rooms:layout_create' layout.room.id %}"
-     data-editor-url="{% url 'rooms:layout_editor' 0 %}"
-     data-csrf="{{ csrf_token }}">
-  <header>
-    <p><a href="{% url 'rooms:layout_list' layout.room.id %}">← все варианты</a></p><br>
-    <h1>{{ layout.room.title }}: вариант {{ layout.title }}</h1>
-    <p class="hint">Тащи мебель мышкой или пальцем, размер меняется за уголок справа снизу. Пунктиром показаны расстояния до стен и соседей, шаг 5 см. Изменения пока не сохраняются на сервер.</p>
-  </header>
+{% endblock %}
 
-  <div class="add" id="add"><span>Добавить:</span></div>
+{% block content %}
+  <div class="wrap" id="app"
+      data-plan-url="{% url 'rooms:layout_plan' layout.id %}"
+      data-w="{{ layout.room.x_dimension }}"
+      data-h="{{ layout.room.y_dimension }}"
+      data-create-url="{% url 'rooms:layout_create' layout.room.id %}"
+      data-editor-url="{% url 'rooms:layout_editor' 0 %}"
+      data-csrf="{{ csrf_token }}">
+    <header>
+      <p><a href="{% url 'rooms:room_list' %}">←← на главную</a></p>
+      <p><a href="{% url 'rooms:layout_list' layout.room.id %}">← все варианты</a></p>
+      <h1>{{ layout.room.title }}: вариант {{ layout.title }}</h1>
+      <p class="hint">Тащи мебель мышкой или пальцем, размер меняется за уголок справа снизу. Пунктиром показаны расстояния до стен и соседей, шаг 5 см.</p>
+    </header>
 
-  <div class="plan">
-    <svg id="svg" viewBox="-34 -30 562 352" role="img" aria-label="План комнаты 490 на 290 см с мебелью, которую можно перетаскивать">
-      <g id="fixed"></g>
-      <g id="items"></g>
-      <g id="dims"></g>
-    </svg>
-  </div>
+    <div class="add" id="add"><span>Добавить:</span></div>
 
-  <div class="panel" id="panel">
-    <label class="field" for="inName">Название <input id="inName" class="name" type="text" maxlength="20"></label>
-    <label class="field" for="inW">Ширина <input id="inW" type="number" min="2" max="490" step="1"></label>
-    <label class="field" for="inH">Глубина <input id="inH" type="number" min="2" max="290" step="1"></label>
-    <div class="pos" id="pos"></div>
-    <div class="btns" data-csrf="{{ csrf_token }}">
-
-      <button id="save" class="primary" type="button">Сохранить</button>
-      <button id="rot" type="button">Повернуть</button>
-      <button id="dup" type="button">Копировать</button>
-      <button id="del" class="del" type="button">Удалить</button>
-      <button id="reset" type="button">Вернуть к последней сохраненной</button>
+    <div class="plan">
+      <svg id="svg" viewBox="-34 -30 562 352" role="img" aria-label="План комнаты 490 на 290 см с мебелью, которую можно перетаскивать">
+        <g id="fixed"></g>
+        <g id="items"></g>
+        <g id="dims"></g>
+      </svg>
     </div>
-    <p class="warn" id="warn" hidden></p>
-    <p class="warn" id="loadErr" hidden></p>
-    <p id="saveMsg" hidden></p>
-  </div>
 
-  <ul class="legend">
-    <li><span style="background:var(--window)"></span>окно (положение примерное)</li>
-    <li><span style="background:var(--arch)"></span>арка (положение примерное)</li>
-    <li><span style="background:var(--tv)"></span>ТВ висит на стене, с мебелью не конфликтует</li>
-  </ul>
-</div>
-<script src="{% static 'rooms/js/editor.js' %}"></script>
-</body>
-</html>
+    <div class="panel" id="panel">
+      <label class="field" for="inName">Название <input id="inName" class="name" type="text" maxlength="20"></label>
+      <label class="field" for="inW">Ширина <input id="inW" type="number" min="2" max="490" step="1"></label>
+      <label class="field" for="inH">Глубина <input id="inH" type="number" min="2" max="290" step="1"></label>
+      <div class="pos" id="pos"></div>
+      <div class="btns" data-csrf="{{ csrf_token }}">
+
+        <button id="save" class="primary" type="button">Сохранить</button>
+        <button id="rot" type="button">Повернуть</button>
+        <button id="dup" type="button">Копировать</button>
+        <button id="del" class="del" type="button">Удалить</button>
+        <button id="reset" type="button">Вернуть к последней сохраненной</button>
+      </div>
+      <p class="warn" id="warn" hidden></p>
+      <p class="warn" id="loadErr" hidden></p>
+      <p id="saveMsg" hidden></p>
+    </div>
+
+    <ul class="legend">
+      <li><span style="background:var(--window)"></span>окно (положение примерное)</li>
+      <li><span style="background:var(--arch)"></span>арка (положение примерное)</li>
+      <li><span style="background:var(--tv)"></span>ТВ висит на стене, с мебелью не конфликтует</li>
+    </ul>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'rooms/js/editor.js' %}"></script>
+{% endblock %}
